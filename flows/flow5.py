@@ -21,5 +21,6 @@ def my_flow(name: str, date: datetime.datetime):
     my_task(name=name, date=date)
 
 
-# creates a flow run called 'marvin-on-Thursday'
-my_flow(name="marvin", date=datetime.datetime.utcnow())
+if __name__ == '__main__':
+    # creates a flow run called 'marvin-on-Thursday'
+    my_flow(name="marvin", date=datetime.datetime.utcnow())

@@ -13,4 +13,5 @@ def validation_flow(x: int, y: str):
     printer(y)
 
 
-validation_flow(x="42", y=100)
+if __name__ == '__main__':
+    validation_flow(x="42", y=100)
