@@ -1,0 +1,3 @@
+CPU Usage: 99.8% ; Memory Usage: 4203.703125 MB 
+CPU Usage: 98.4% ; Memory Usage: 4225.31640625 MB 
+CPU Usage: 99.0% ; Memory Usage: 4236.66015625 MB 

@@ -32,15 +32,13 @@ services:
     restart: always
     volumes:
       - prefect:/root/.prefect
+    entrypoint: ["prefect", "orion", "start"]
     environment:
       # If you want to access Prefect Server from anywhere other than the Docker host machine, you will need to change
       # PREFECT_UI_URL to match the external hostname/IP used to load the  UI in your web browser.
-      #- PREFECT_ORION_API_HOST=0.0.0.0
       - PREFECT_UI_URL=http://127.0.0.0:4200/api
-      #- PREFECT_ORION_API_HOST=127.0.0.1
-      #- PREFECT_ORION_API_PORT=4200
+      - PREFECT_ORION_API_HOST=0.0.0.0
       - PREFECT_ORION_DATABASE_CONNECTION_URL=postgresql+asyncpg://postgres:postgres@database:5432/prefect
-    entrypoint: ["prefect", "orion", "start", "--host", "0.0.0.0"]
     ports:
       - "4200:4200"
     depends_on:
@@ -54,8 +52,6 @@ services:
     entrypoint: ["prefect", "agent", "start", "-q", "awesome"]
     environment:
       - PREFECT_API_URL=http://server:4200/api
-#       Use PREFECT_API_KEY if connecting the agent to Prefect Cloud
-#     - PREFECT_API_KEY=YOUR_API_KEY
     profiles: ["agent"]
 
   ### Prefect CLI
@@ -67,8 +63,6 @@ services:
       - "./flows:/root/flows"
     environment:
       - PREFECT_API_URL=http://server:4200/api
-#       Use PREFECT_API_KEY to use the CLI to interact with Prefect Cloud
-#     - PREFECT_API_KEY=YOUR_API_KEY
     profiles: ["cli"]
 
 volumes:
