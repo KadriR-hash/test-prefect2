@@ -1,7 +1,6 @@
 version: "3.9"
 services:
 
-  ### Prefect Database
   database:
     image: postgres:15.2-alpine
     restart: always
@@ -15,7 +14,6 @@ services:
       - db:/var/lib/postgresql/data
     profiles: ["server"]
 
-  ### MinIO for flow storage
   minio:
     image: minio/minio:latest
     entrypoint: ["minio", "server", "--address", "0.0.0.0:9000", "--console-address", "0.0.0.0:9001", "/data"]
@@ -26,7 +24,6 @@ services:
       - "9001:9001"
     profiles: ["minio"]
 
-  ### Prefect Server API and UI
   server:
     image: prefecthq/prefect:2.8.0-python3.11
     restart: always
@@ -45,7 +42,6 @@ services:
       - database
     profiles: ["server"]
 
-  ## Prefect Agent
   agent:
     image: prefecthq/prefect:2.8.0-python3.11
     restart: always
@@ -54,7 +50,6 @@ services:
       - PREFECT_API_URL=http://server:4200/api
     profiles: ["agent"]
 
-  ### Prefect CLI
   cli:
     image: prefecthq/prefect:2.8.0-python3.11
     entrypoint: "bash"
@@ -65,10 +60,56 @@ services:
       - PREFECT_API_URL=http://server:4200/api
     profiles: ["cli"]
 
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    hostname: azurite
+    restart: on-failure
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    networks:
+      default:
+        aliases:
+          - devstoreaccount1.blob.core.dev.local
+
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: prefect
+      POSTGRES_PASSWORD: prefect
+      POSTGRES_DB: prefect
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    restart: always
+
+  pgadmin:
+    container_name: pg_container
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: 'admin@admin.com'
+      PGADMIN_DEFAULT_PASSWORD: 'root'
+      PGADMIN_CONFIG_ALLOW_SAVE_PASSWORD: 'False'
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+
+  fastapi:
+    build: ./app
+    ports:
+      - "8000:8000"
+
 volumes:
   prefect:
   db:
   minio:
+  postgres-db-volume:
+  pgadmin:
+
 networks:
   default:
     name: prefect-network
