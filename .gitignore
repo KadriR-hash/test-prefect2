@@ -3,4 +3,3 @@ venv
 flows/*.yaml
 flows/.prefectignore
 flows/data
-flows/benchmark

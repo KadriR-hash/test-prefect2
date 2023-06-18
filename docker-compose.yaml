@@ -25,15 +25,15 @@ services:
     profiles: ["minio"]
 
   server:
-    image: prefecthq/prefect:2.8.0-python3.11
+    build: .
     restart: always
     volumes:
       - prefect:/root/.prefect
     entrypoint: ["prefect", "orion", "start"]
     environment:
-      # If you want to access Prefect Server from anywhere other than the Docker host machine, you will need to change
+      # If you want to access Prefect Server from anywhere other than the Docker host machine, you will need to change.
       # PREFECT_UI_URL to match the external hostname/IP used to load the  UI in your web browser.
-      - PREFECT_UI_URL=http://127.0.0.0:4200/api
+      - PREFECT_UI_URL=http://localhost:4200/api
       - PREFECT_ORION_API_HOST=0.0.0.0
       - PREFECT_ORION_DATABASE_CONNECTION_URL=postgresql+asyncpg://postgres:postgres@database:5432/prefect
     ports:
@@ -43,7 +43,7 @@ services:
     profiles: ["server"]
 
   agent:
-    image: prefecthq/prefect:2.8.0-python3.11
+    build: .
     restart: always
     entrypoint: ["prefect", "agent", "start", "-q", "awesome"]
     environment:
@@ -51,7 +51,7 @@ services:
     profiles: ["agent"]
 
   cli:
-    image: prefecthq/prefect:2.8.0-python3.11
+    build: .
     entrypoint: "bash"
     working_dir: "/root/flows"
     volumes:
@@ -60,56 +60,49 @@ services:
       - PREFECT_API_URL=http://server:4200/api
     profiles: ["cli"]
 
-  azurite:
-    image: mcr.microsoft.com/azure-storage/azurite
-    hostname: azurite
-    restart: on-failure
-    ports:
-      - "10000:10000"
-      - "10001:10001"
-      - "10002:10002"
-    networks:
-      default:
-        aliases:
-          - devstoreaccount1.blob.core.dev.local
+#  azurite:
+#    image: mcr.microsoft.com/azure-storage/azurite
+#    hostname: azurite
+#    restart: on-failure
+#    ports:
+#      - "10000:10000"
+#      - "10001:10001"
+#      - "10002:10002"
+#    networks:
+#      default:
+#        aliases:
+#          - devstoreaccount1.blob.core.dev.local
+#
+#
+#  postgres:
+#    image: postgres:13
+#    environment:
+#      POSTGRES_USER: prefect
+#      POSTGRES_PASSWORD: prefect
+#      POSTGRES_DB: prefect
+#    volumes:
+#      - postgres-db-volume:/var/lib/postgresql/data
+#    restart: always
+#
+#  pgadmin:
+#    container_name: pg_container
+#    image: dpage/pgadmin4
+#    restart: always
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: 'admin@admin.com'
+#      PGADMIN_DEFAULT_PASSWORD: 'root'
+#      PGADMIN_CONFIG_ALLOW_SAVE_PASSWORD: 'False'
+#      PGADMIN_CONFIG_SERVER_MODE: 'False'
+#    volumes:
+#      - pgadmin:/var/lib/pgadmin
+#    ports:
+#      - "5050:80"
 
-
-  postgres:
-    image: postgres:13
-    environment:
-      POSTGRES_USER: prefect
-      POSTGRES_PASSWORD: prefect
-      POSTGRES_DB: prefect
-    volumes:
-      - postgres-db-volume:/var/lib/postgresql/data
-    restart: always
-
-  pgadmin:
-    container_name: pg_container
-    image: dpage/pgadmin4
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: 'admin@admin.com'
-      PGADMIN_DEFAULT_PASSWORD: 'root'
-      PGADMIN_CONFIG_ALLOW_SAVE_PASSWORD: 'False'
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
-    volumes:
-      - pgadmin:/var/lib/pgadmin
-    ports:
-      - "5050:80"
-
-  fastapi:
-    build: ./app
-    ports:
-      - "8000:8000"
 
 volumes:
   prefect:
   db:
   minio:
   postgres-db-volume:
-  pgadmin:
+  #pgadmin:
 
-networks:
-  default:
-    name: prefect-network

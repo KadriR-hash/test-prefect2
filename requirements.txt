@@ -1,0 +1,5 @@
+prefect-azure[blob_storage]==0.2.7
+prefect-sqlalchemy==0.2.4
+azure-storage-blob==12.3.2
+psycopg2-binary==2.9.6
+aiohttp==3.8.4
